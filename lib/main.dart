@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Zeiterfassung',
+      title: 'GleitZeitRechner Revanced',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
@@ -38,14 +38,14 @@ class _TimeTrackingPageState extends State<TimeTrackingPage> {
   static const int maxWorkHoursPerDay = 10; // Maximale Arbeitszeit ohne Pausen
   
   // Aktuelle Zeiten
-  DateTime? _startTime;
+  DateTime? _startTime = DateTime.now();
   Timer? _timer;
   Duration _elapsedWorkTime = Duration.zero;
   Duration _breakTime = Duration.zero;
   Duration _requiredBreakTime = Duration.zero;
   
   // Benutzereinstellungen
-  int _weeklyWorkHours = 40; // Standard: Vollzeit 40h
+  int _weeklyWorkHours = 39; // Standard: Vollzeit 40h
   TimeOfDay _manualStartTime = TimeOfDay(hour: 8, minute: 0); // Standardwert: 8:00 Uhr
 
   @override
@@ -65,7 +65,7 @@ class _TimeTrackingPageState extends State<TimeTrackingPage> {
   Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      _weeklyWorkHours = prefs.getInt('weeklyWorkHours') ?? 40;
+      _weeklyWorkHours = prefs.getInt('weeklyWorkHours') ?? 39;
       
       // Gespeicherten Dienstbeginn laden (falls vorhanden)
       final savedHour = prefs.getInt('startTimeHour');
@@ -205,8 +205,14 @@ class _TimeTrackingPageState extends State<TimeTrackingPage> {
     
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Zeiterfassung'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Text(
+          'GleitZeitRechner Revanced',
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onPrimary,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: Theme.of(context).colorScheme.primary,
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
