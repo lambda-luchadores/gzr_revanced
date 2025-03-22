@@ -2,7 +2,7 @@
 
 {
   # https://devenv.sh/basics/
-  # env.GREET = "devenv";
+  env.CHROME_EXECUTABLE = "chromium";
 
   # https://devenv.sh/packages/
   packages = with pkgs; [ flutter ];
