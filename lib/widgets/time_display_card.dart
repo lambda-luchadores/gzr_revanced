@@ -73,8 +73,18 @@ class TimeDisplayCard extends StatelessWidget {
                   ),
                   _buildTimeInfo(
                     context,
-                    'Erwartetes Ende',
+                    'Sollende',
                     _calculateExpectedEndTime(provider),
+                  ),
+                  Container(
+                    width: 1,
+                    height: 40,
+                    color: BundesbankColors.backgroundWhite.withValues(alpha: 0.3),
+                  ),
+                  _buildTimeInfo(
+                    context,
+                    'Spätestes Ende',
+                    _calculateMaxEndTime(provider),
                   ),
                 ],
               ),
@@ -109,34 +119,35 @@ class TimeDisplayCard extends StatelessWidget {
   Widget _buildEditableTimeInfo(BuildContext context, String label, String time, VoidCallback onTap) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(12.0),
         child: Column(
           children: [
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
+                Icon(
+                  Icons.edit,
+                  size: 16,
+                  color: BundesbankColors.backgroundWhite,
+                ),
+                const SizedBox(width: 4),
                 Text(
                   label,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: BundesbankColors.backgroundWhite.withValues(alpha: 0.7),
+                        color: BundesbankColors.backgroundWhite,
+                        fontWeight: FontWeight.bold,
                       ),
-                ),
-                const SizedBox(width: 4),
-                Icon(
-                  Icons.edit,
-                  size: 14,
-                  color: BundesbankColors.backgroundWhite.withValues(alpha: 0.7),
                 ),
               ],
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 6),
             Text(
               time,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     color: BundesbankColors.backgroundWhite,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.bold,
                   ),
             ),
           ],
@@ -156,6 +167,30 @@ class TimeDisplayCard extends StatelessWidget {
     }
     
     return provider.formatTime(expectedEndTime);
+  }
+
+  String _calculateMaxEndTime(TimeTrackingProvider provider) {
+    if (provider.currentWorkDay == null) return '--:--';
+    
+    // Maximum work duration is 10 hours and 45 minutes (10.75 hours)
+    const maxWorkDuration = Duration(hours: 10, minutes: 45);
+    final maxEndTimeFromStart = provider.currentWorkDay!.startTime.add(maxWorkDuration);
+    
+    // Hard limit at 20:00
+    final hardLimit = DateTime(
+      provider.currentWorkDay!.date.year,
+      provider.currentWorkDay!.date.month,
+      provider.currentWorkDay!.date.day,
+      20,
+      0,
+    );
+    
+    // Use whichever comes first
+    if (maxEndTimeFromStart.isBefore(hardLimit)) {
+      return provider.formatTime(maxEndTimeFromStart);
+    } else {
+      return '20:00';
+    }
   }
 
   Future<void> _showTimePicker(BuildContext context, TimeTrackingProvider provider) async {
